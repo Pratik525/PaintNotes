@@ -2,11 +2,19 @@ package example.info.com.paintnotes;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,14 +22,18 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,13 +113,99 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mDialogMakeCanvas.show();
                 break;
             case R.id.fab_menu_option_upload :
+                showDialogSelector(this);
                 break;
         }
+    }
+
+    public void showDialogSelector(Context mContext){
+        final Dialog mDialog = new Dialog(mContext);
+        mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        mDialog.setContentView(R.layout.pic_selector_dialog);
+        mDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+
+        Button mButtonCamera = (Button) mDialog.findViewById(R.id.cameraButton);
+        Button mButtonGallery = (Button) mDialog.findViewById(R.id.galleryButton);
+        mButtonCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent, 0);
+                mDialog.dismiss();
+            }
+        });
+
+        mButtonGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent pickPhoto = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(pickPhoto,0);
+                mDialog.dismiss();
+            }
+        });
+        mDialog.show();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Bitmap bitmap;
+        String filePath;
+        if(resultCode == RESULT_OK && requestCode==0)
+        {
+            Uri selectedImage = data.getData();
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
+                filePath = getPathFromURI(selectedImage);
+                try {
+                    ExifInterface exif = new ExifInterface(filePath);
+                    int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, 1);
+                    Log.d("CAMERA_ORIENTATION", ""+orientation);
+                    Matrix matrix = new Matrix();
+                    if (orientation == 6) {
+                        matrix.postRotate(90);
+                    }
+                    else if (orientation == 3) {
+                        matrix.postRotate(180);
+                    }
+                    else if (orientation == 8) {
+                        matrix.postRotate(270);
+                    }
+                    bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                }
+                catch (Exception e) {
+                }
+                if(bitmap!=null){
+                    onSaveClicked(bitmap);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private String getPathFromURI(Uri contentUri) {
+        String[] proj = {MediaStore.Images.Media.DATA };
+        CursorLoader loader = new CursorLoader(this, contentUri, proj, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String result = cursor.getString(column_index);
+        cursor.close();
+        return result;
     }
 
     @Override
     public void onSaveClicked(Bitmap bitmap) {
         bitmapList.add(bitmap);
+        recyclerAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onSaveClicked(Bitmap bitmap, int index) {
+        bitmapList.remove(index);
+        bitmapList.add(index, bitmap);
         recyclerAdapter.notifyDataSetChanged();
     }
 

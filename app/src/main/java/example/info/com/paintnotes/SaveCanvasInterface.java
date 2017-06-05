@@ -8,4 +8,5 @@ import android.graphics.Bitmap;
 
 public interface SaveCanvasInterface {
     void onSaveClicked(Bitmap bitmap);
+    void onSaveClicked(Bitmap bitmap, int index);
 }

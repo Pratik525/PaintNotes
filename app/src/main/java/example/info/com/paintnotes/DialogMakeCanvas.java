@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
@@ -11,32 +12,47 @@ import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
+import android.util.DisplayMetrics;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 /**
  * Created by pratik.sinha on 6/1/2017.
  */
 
-public class DialogMakeCanvas extends Dialog implements View.OnClickListener,DialogInterface.OnDismissListener, PaintReleaseCallBack{
+public class DialogMakeCanvas extends Dialog implements View.OnClickListener,DialogInterface.OnDismissListener,
+        PaintReleaseCallBack, View.OnTouchListener{
 
     private Context mContext;
     private SaveCanvasInterface mSaveCanvasInterface = null;
     private RelativeLayout mRelativeCanvas;
     private PaintView mPaintView;
     private TextView mTvSave;
-    private ImageView mPenImageView;
+    private Bitmap mBitmap = null;
+    private int index = -1;
     //private ImageView mPenImage;
 
     public DialogMakeCanvas(Context context, SaveCanvasInterface saveCanvasInterface) {
         super(context);
         mContext = context;
         mSaveCanvasInterface = saveCanvasInterface;
+        initDialogProperties();
+
+    }
+
+    public DialogMakeCanvas(Context context, SaveCanvasInterface saveCanvasInterface, Bitmap bitmap, int index) {
+        super(context);
+        mContext = context;
+        mSaveCanvasInterface = saveCanvasInterface;
+        mBitmap = bitmap;
+        this.index = index;
         initDialogProperties();
     }
 
@@ -65,23 +81,16 @@ public class DialogMakeCanvas extends Dialog implements View.OnClickListener,Dia
     private void initView(View view) {
         mRelativeCanvas = (RelativeLayout) findViewById(R.id.rel_lyt_canvas);
         mTvSave = (TextView) findViewById(R.id.tv_save);
-       // mPenImageView = (ImageView) findViewById(R.id.pen);
         mPaintView = new PaintView(mContext, this);
-
         //
         mPaintView.setLayoutParams(new ViewGroup.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         mRelativeCanvas.addView(mPaintView);
+        if(mBitmap!=null){
+            Drawable d = new BitmapDrawable(mContext.getResources(), mBitmap);
+            mPaintView.setBackground(d);
+        }
         mTvSave.setOnClickListener(this);
-        //mPenImageView.setVisibility(View.GONE);
-        mPenImageView = new ImageView(mContext);
-        mPenImageView.setBackgroundColor(Color.RED);
-        mPenImageView.setRotation(-30);
-
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,100);
-        mPenImageView.setLayoutParams(layoutParams);
-
-        mRelativeCanvas.addView(mPenImageView);
     }
 
     @Override
@@ -97,7 +106,12 @@ public class DialogMakeCanvas extends Dialog implements View.OnClickListener,Dia
                 mPaintView.setDrawingCacheEnabled(true);
                 Bitmap bitmap = Bitmap.createBitmap(mPaintView.getDrawingCache());
                 mPaintView.setDrawingCacheEnabled(false);
-                mSaveCanvasInterface.onSaveClicked(bitmap);
+                if(index!=-1){
+                    mSaveCanvasInterface.onSaveClicked(bitmap, index);
+                }
+                else{
+                    mSaveCanvasInterface.onSaveClicked(bitmap);
+                }
                 dismiss();
                 break;
         }
@@ -114,10 +128,11 @@ public class DialogMakeCanvas extends Dialog implements View.OnClickListener,Dia
 
     @Override
     public void setPenPosition(int x, int y) {
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) mPenImageView.getLayoutParams();
-        layoutParams.leftMargin = x -25; layoutParams.topMargin = y - 75;
-        mPenImageView.setLayoutParams(layoutParams);
+
     }
 
-
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        return false;
+    }
 }

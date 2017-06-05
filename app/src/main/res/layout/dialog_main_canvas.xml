@@ -3,16 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <RelativeLayout
         android:id="@+id/rel_lyt_canvas"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/imageView"
-        android:layout_toEndOf="@+id/imageView"
-        android:layout_marginLeft="61dp"
-        android:layout_marginStart="61dp"
-        android:layout_marginTop="83dp" />
+        />
+
 
     <TextView
         android:id="@+id/tv_save"
@@ -27,12 +25,5 @@
         android:background="#0000ff">
     </TextView>
 
-    <ImageView
-        android:layout_width="5dp"
-        android:rotation="-30"
-        android:visibility="gone"
-        android:background="@android:color/holo_red_dark"
-        android:layout_height="100dp"
-        android:id="@+id/pen" />
 
 </RelativeLayout>

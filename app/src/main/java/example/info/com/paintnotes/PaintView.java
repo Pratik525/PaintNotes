@@ -61,7 +61,7 @@ public class PaintView extends View implements View.OnTouchListener, View.OnLong
     public boolean onTouch(View view, MotionEvent event) {
         Point point = new Point();
         point.x = event.getX();
-        point.y = event.getY()-dpToPx(200);
+        point.y = event.getY();
         points.add(point);
         switch (event.getAction()) {
             case MotionEvent.ACTION_UP:
@@ -71,7 +71,6 @@ public class PaintView extends View implements View.OnTouchListener, View.OnLong
                 invalidate();
                 break;
         }
-        paintReleaseCallBack.setPenPosition((int)event.getX(), (int)event.getY());
         invalidate();
         Log.d(TAG, "point: " + point);
         return true;

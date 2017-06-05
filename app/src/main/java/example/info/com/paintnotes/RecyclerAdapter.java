@@ -43,9 +43,16 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
         }
 
         @Override
-        public void onBindViewHolder(final MyViewHolder holder, int position) {
-            Bitmap notes = notesList.get(position);
+        public void onBindViewHolder(final MyViewHolder holder, final int position) {
+            final Bitmap notes = notesList.get(position);
             holder.notesIcon.setImageBitmap(notes);
+            holder.notesIcon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DialogMakeCanvas dialogMakeCanvas = new DialogMakeCanvas(mContext, (MainActivity)mContext, notes, position);
+                    dialogMakeCanvas.show();
+                }
+            });
         }
 
         @Override
