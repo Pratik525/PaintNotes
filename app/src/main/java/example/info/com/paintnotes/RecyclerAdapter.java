@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 /**
@@ -44,16 +47,19 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
 
         @Override
         public void onBindViewHolder(final MyViewHolder holder, final int position) {
-            final Bitmap notes = notesList.get(position);
-            holder.notesIcon.setImageBitmap(notes);
+
+            Glide.with(holder.notesIcon.getContext()).load(bitmapToByte(notesList.get(position))).asBitmap().into(holder.notesIcon);
+            //final Bitmap notes = notesList.get(position);
+            //holder.notesIcon.setImageBitmap(notes);
             holder.notesIcon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    DialogMakeCanvas dialogMakeCanvas = new DialogMakeCanvas(mContext, (MainActivity)mContext, notes, position);
+                    DialogMakeCanvas dialogMakeCanvas = new DialogMakeCanvas(mContext, (MainActivity)mContext, notesList.get(position), position);
                     dialogMakeCanvas.show();
                 }
             });
         }
+    private byte[] bitmapToByte(Bitmap bitmap){ ByteArrayOutputStream stream = new ByteArrayOutputStream(); bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream); byte[] byteArray = stream.toByteArray(); return byteArray; }
 
         @Override
         public int getItemCount() {

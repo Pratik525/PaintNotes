@@ -3,15 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <RelativeLayout
+<!--<ScrollView-->
+    <!--android:id="@+id/scrollview"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:background="@color/cardview_dark_background"-->
+    <!--android:layout_height="match_parent">-->
+    <LinearLayout
+        android:orientation="vertical"
         android:id="@+id/rel_lyt_canvas"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        />
+        ></LinearLayout>
 
-
+<!--</ScrollView>-->
     <TextView
         android:id="@+id/tv_save"
         android:layout_alignParentBottom="true"

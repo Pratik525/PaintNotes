@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -32,11 +33,12 @@ public class DialogMakeCanvas extends Dialog implements View.OnClickListener,Dia
 
     private Context mContext;
     private SaveCanvasInterface mSaveCanvasInterface = null;
-    private RelativeLayout mRelativeCanvas;
+    private LinearLayout mRelativeCanvas;
     private PaintView mPaintView;
     private TextView mTvSave;
     private Bitmap mBitmap = null;
     private int index = -1;
+    private ScrollView scrollview;
     //private ImageView mPenImage;
 
     public DialogMakeCanvas(Context context, SaveCanvasInterface saveCanvasInterface) {
@@ -79,9 +81,18 @@ public class DialogMakeCanvas extends Dialog implements View.OnClickListener,Dia
     }
 
     private void initView(View view) {
-        mRelativeCanvas = (RelativeLayout) findViewById(R.id.rel_lyt_canvas);
+        mRelativeCanvas = (LinearLayout) findViewById(R.id.rel_lyt_canvas);
         mTvSave = (TextView) findViewById(R.id.tv_save);
         mPaintView = new PaintView(mContext, this);
+        mPaintView.setBackgroundColor(Color.BLUE);
+//        scrollview = (ScrollView)findViewById(R.id.scrollview);
+//        //scrollview.requestDisallowInterceptTouchEvent(true);
+//        scrollview.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                return true;
+//            }
+//        });
         //
         mPaintView.setLayoutParams(new ViewGroup.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
